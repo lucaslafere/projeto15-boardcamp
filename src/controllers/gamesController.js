@@ -2,15 +2,32 @@ import connection from "../db/database.js";
 import { gamesPostSchema } from "../schemas/gamesSchema.js";
 
 
-// falta relacionar o nome da categoria do jogo aqui
 // falta adicionar query string 
 export async function getGames (req, res) {
+    const name = req.query.name;
+    let query;
     try {
-        const { rows: games } = await connection.query(`SELECT * FROM games`);
-        // falta relacionar o nome da categoria do jogo aqui
+        if (name !== undefined) {
+            const nameLowerCase = name.toLowerCase();
+            query = `
+            SELECT games.*, categories.name as "categoryName" FROM games 
+            JOIN categories
+            ON games."categoryId"=categories.id
+            WHERE name
+            LIKE '${nameLowerCase}%'`;
+        }
+        else {
+            query = `
+            SELECT games.*, categories.name as "categoryName" FROM games
+            JOIN categories 
+            ON games."categoryId"=categories.id`;
+        }
+        console.log(query)
+        const { rows: games } = await connection.query(query);
         return res.send(games);
+
     } catch (error) {
-        return res.status(500).send("Server failed");
+        return res.status(500).send(error);
     }
 }
 
