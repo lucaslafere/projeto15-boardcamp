@@ -2,18 +2,17 @@ import connection from "../db/database.js";
 import { gamesPostSchema } from "../schemas/gamesSchema.js";
 
 
-// falta adicionar query string 
 export async function getGames (req, res) {
-    const name = req.query.name;
+    const nameQuery = req.query.name;
     let query;
     try {
-        if (name !== undefined) {
-            const nameLowerCase = name.toLowerCase();
+        if (nameQuery !== undefined) {
+            const nameLowerCase = nameQuery.toLowerCase();
             query = `
             SELECT games.*, categories.name as "categoryName" FROM games 
             JOIN categories
             ON games."categoryId"=categories.id
-            WHERE name
+            WHERE games.name
             LIKE '${nameLowerCase}%'`;
         }
         else {
