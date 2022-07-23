@@ -21,7 +21,6 @@ export async function getGames (req, res) {
             JOIN categories 
             ON games."categoryId"=categories.id`;
         }
-        console.log(query)
         const { rows: games } = await connection.query(query);
         return res.send(games);
 
@@ -39,8 +38,20 @@ export async function postGames (req, res) {
         if (checkExistingGame.rowCount > 0) {
             return res.status(409).send("Esse jogo já existe");
         }
-        const createGame = await connection.query(`INSERT INTO games (name, image, "stockTotal", "categoryId", "pricePerDay") VALUES ('${body.name}', '${body.image}', ${body.stockTotal}, ${body.categoryId}, ${body.pricePerDay} )`);
-        return res.sendStatus(201);
+        const checkExistingCategory = await connection.query(`
+        SELECT games.* FROM games
+        JOIN categories
+        ON games."categoryId"=categories.id
+        WHERE games."categoryId" = ${body.categoryId}
+        `)
+        if (checkExistingCategory.rowCount > 0) {
+            await connection.query(`INSERT INTO games (name, image, "stockTotal", "categoryId", "pricePerDay") VALUES ('${body.name}', '${body.image}', ${body.stockTotal}, ${body.categoryId}, ${body.pricePerDay} )`);
+            return res.sendStatus(201);
+        }
+        else {
+            return res.status(400).send("Essa categoria não existe");
+        }
+        
     } catch (error) {
         return res.status(500).send("Server failed");
     }
