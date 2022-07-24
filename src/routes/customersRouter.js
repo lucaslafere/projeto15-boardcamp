@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { getCustomers } from '../controllers/customersController.js';
+import { getCustomers, getCustomersById } from '../controllers/customersController.js';
 
 const router = Router();
 router.get('/customers', getCustomers);
-router.get('/customers/:id');
+router.get('/customers/:id', getCustomersById);
 router.post('/customers');
 router.put('/customers:id');
 

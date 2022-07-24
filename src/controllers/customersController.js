@@ -3,7 +3,6 @@ import connection from "../db/database.js";
 
 export async function getCustomers (req, res) {
     const cpfQuery = req.query.cpf;
-    console.log(typeof(cpfQuery))
     let query;
     try {
         if (cpfQuery !== undefined) {
@@ -22,4 +21,17 @@ export async function getCustomers (req, res) {
     } catch (error) {
         return res.status(500).send(error);
     }
+}
+
+export async function getCustomersById (req, res) {
+    const { id } = req.params;
+    try {
+        const query = `
+        SELECT * FROM customers WHERE id=$1`
+        const { rows: customers } = await connection.query(query, [id]);
+        return res.send(customers[0]);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+    
 }
